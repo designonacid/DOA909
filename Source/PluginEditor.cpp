@@ -200,10 +200,10 @@ void ThumpEditor::resized()
     auto r = getLocalBounds().reduced (16);
     auto header = r.removeFromTop (44);
 
-    auto right = header.removeFromRight (560);
+    auto right = header.removeFromRight (610);
     auditionBtn.setBounds (right.removeFromRight (80).reduced (0, 6));
     right.removeFromRight (12);
-    presetBox.setBounds (right.removeFromRight (180).reduced (0, 6));
+    presetBox.setBounds (right.removeFromRight (230).reduced (0, 6));
     right.removeFromRight (20);
     snapBtn.setBounds (right.removeFromRight (70).reduced (0, 6));
     right.removeFromRight (12);

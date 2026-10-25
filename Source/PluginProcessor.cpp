@@ -40,6 +40,38 @@ namespace
                               { "highCut", 3000 }, { "clickLevel", 0.1f } },
               curve ({ { 0, hz (900), -0.4f }, { 0.08f, hz (90), -0.2f }, { 1, hz (50), 0 } }),
               curve ({ { 0, 1, 0 }, { 0.3f, 0.6f, -0.3f }, { 1, 0, 0 } }) },
+
+            // ---- Trance -------------------------------------------------------------
+            // Uplifting / progressive (~138 BPM): warm ~55 Hz tail that is gone before the
+            // offbeat bass, bright noise click to cut through supersaws.
+            { "Trance - Uplifting", { { "length", 260 }, { "clickLevel", 0.55f }, { "clickTone", 0.75f }, { "clickDecay", 0.15f },
+                                      { "distDrive", 0.25f }, { "shape", 0.1f }, { "lowBoost", 1.5f } },
+              curve ({ { 0, hz (9000), -0.7f }, { 0.03f, hz (200), -0.4f }, { 0.25f, hz (60), 0 }, { 1, hz (55), 0 } }),
+              curve ({ { 0, 1, 0 }, { 0.45f, 0.8f, -0.6f }, { 0.85f, 0.05f, 0 }, { 1, 0, 0 } }) },
+            // Psytrance: exactly a 1/8 note at 145 BPM (207 ms), sweep resolves on G1 (49 Hz),
+            // "fishtail" amp shape: snappy hit, brief dip, then the boom. Leaves room for the rolling bass.
+            { "Trance - Psy 145 G1", { { "length", 207 }, { "clickType", 1 }, { "clickLevel", 0.45f }, { "clickTone", 0.85f },
+                                       { "clickDecay", 0.1f }, { "distDrive", 0.15f } },
+              curve ({ { 0, hz (12000), -0.7f }, { 0.02f, hz (400), -0.5f }, { 0.08f, hz (120), -0.3f }, { 0.35f, hz (49), 0 }, { 1, hz (49), 0 } }),
+              curve ({ { 0, 1, -0.4f }, { 0.08f, 0.45f, 0.3f }, { 0.2f, 0.9f, 0 }, { 0.7f, 0.75f, -0.5f }, { 1, 0, 0 } }) },
+
+            // ---- Melodic techno -----------------------------------------------------
+            // Deep (~124 BPM): round, low ~48 Hz tail, soft dark click, gentle saturation.
+            { "Melodic - Deep", { { "length", 470 }, { "clickLevel", 0.3f }, { "clickTone", 0.45f }, { "clickDecay", 0.25f },
+                                  { "distDrive", 0.2f }, { "highCut", 9000 }, { "lowBoost", 2 } },
+              curve ({ { 0, hz (4000), -0.6f }, { 0.03f, hz (160), -0.4f }, { 0.2f, hz (55), 0 }, { 1, hz (48), 0 } }),
+              curve ({ { 0, 1, 0 }, { 0.6f, 0.7f, -0.5f }, { 1, 0, 0 } }) },
+            // Main stage: punchier and shorter, transient-heavy, more drive. Sits between techno and trance.
+            { "Melodic - Main Stage", { { "length", 380 }, { "shape", 0.15f }, { "distDrive", 0.35f }, { "clickLevel", 0.45f },
+                                        { "clickTone", 0.6f }, { "clickDecay", 0.2f }, { "lowBoost", 1 } },
+              curve ({ { 0, hz (7000), -0.7f }, { 0.025f, hz (220), -0.4f }, { 0.18f, hz (58), 0 }, { 1, hz (50), 0 } }),
+              curve ({ { 0, 1, 0 }, { 0.5f, 0.8f, -0.5f }, { 1, 0, 0 } }) },
+            // Rumble layer: put on its own track under the main kick, add reverb, sidechain it to the kick.
+            // Long, dark, saturated sub tail with no click.
+            { "Melodic - Rumble Layer", { { "length", 1200 }, { "phase", 0 }, { "clickLevel", 0 }, { "shape", 0.3f },
+                                          { "distDrive", 0.6f }, { "highCut", 250 }, { "volume", -4 } },
+              curve ({ { 0, hz (300), -0.4f }, { 0.1f, hz (55), 0 }, { 1, hz (47), 0 } }),
+              curve ({ { 0, 1, 0 }, { 0.5f, 0.85f, -0.5f }, { 1, 0, 0 } }) },
         };
         return presets;
     }
@@ -216,7 +248,7 @@ void ThumpProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
         // overlapping hits during a retrigger crossfade can sum above full scale:
         // same soft knee as the engine keeps the output under 0 dBFS
         const float a = std::abs (s);
-        out[i] = a > 0.8f ? std::copysign (0.8f + 0.18f * std::tanh ((a - 0.8f) / 0.18f), s) : s;
+        out[i] = a > 0.9f ? std::copysign (0.9f + 0.08f * std::tanh ((a - 0.9f) / 0.08f), s) : s;
     }
 
     for (int ch = 1; ch < buffer.getNumChannels(); ++ch)

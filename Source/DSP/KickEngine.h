@@ -122,7 +122,7 @@ private:
 //==============================================================================
 inline float distort (float x, int type, float drive)
 {
-    const float g = 1.0f + drive * 24.0f;
+    const float g = 1.0f + drive * drive * 24.0f;   // squared: gentle at low settings
     switch (type)
     {
         case 1: return std::clamp (x * g, -1.0f, 1.0f);                       // hard clip
@@ -131,7 +131,7 @@ inline float distort (float x, int type, float drive)
                   return v; }
         case 3: { const float steps = std::pow (2.0f, 16.0f - drive * 13.0f);  // bit crush
                   return std::round (std::tanh (x * (1.0f + drive * 3.0f)) * steps) / steps; }
-        default: return std::tanh (x * g) / std::tanh (std::max (1.0f, g * 0.5f)); // soft
+        default: return std::tanh (x * g) / std::tanh (g);                       // soft, unity peak
     }
 }
 
@@ -207,7 +207,7 @@ inline std::vector<float> renderKick (const KickParams& p, const Curve& pitch, c
         s *= outGain;
         // gentle safety ceiling so stacked click + boost never hard-clips the DAW
         const float a = std::abs (s);
-        if (a > 0.8f) s = std::copysign (0.8f + 0.18f * std::tanh ((a - 0.8f) / 0.18f), s); // soft knee, max -0.2 dBFS
+        if (a > 0.9f) s = std::copysign (0.9f + 0.08f * std::tanh ((a - 0.9f) / 0.08f), s); // soft knee, max -0.2 dBFS
         if (i >= n - fadeLen) s *= (float) (n - 1 - i) / (float) fadeLen;
         out[(size_t) i] = s;
     }

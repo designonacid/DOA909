@@ -18,7 +18,16 @@ as curves, layer a click, drive it, EQ it, trigger it from MIDI.
 - **EQ**: low shelf boost/cut at 60 Hz, high cut.
 - **Output**: velocity sensitivity, volume, soft ceiling below 0 dBFS.
 - Any MIDI note triggers the kick; retriggers crossfade in 2 ms so they never click.
-- 5 factory presets: Init Punch, Deep 808, Hard Techno, Hardstyle Tail, Lo-Fi Thud.
+- 10 factory presets:
+  - General: Init Punch, Deep 808, Hard Techno, Hardstyle Tail, Lo-Fi Thud
+  - **Trance - Uplifting** (~138 BPM): warm ~55 Hz tail that is gone by the offbeat bass, bright click
+  - **Trance - Psy 145 G1**: exactly a 1/8 note at 145 BPM, resolves on G1 (49 Hz), "fishtail" amp shape
+    (snap, dip, boom) to leave room for a rolling bassline. Retune the last pitch points with SNAP for other keys,
+    and set Length to 30000 / BPM ms for other tempos.
+  - **Melodic - Deep** (~124 BPM): round ~48 Hz tail, dark soft click
+  - **Melodic - Main Stage**: shorter, punchier, more drive, between techno and trance
+  - **Melodic - Rumble Layer**: long dark saturated sub tail with no click. Put it on its own track under the
+    main kick, add reverb, and sidechain it to the main kick.
 - Curves and settings save with your DAW project.
 
 ## How it works

@@ -48,6 +48,40 @@ int main()
         }
     }
 
+    // Genre loops: 2 bars of four-on-the-floor per new preset, at a fitting tempo
+    {
+        struct G { int preset; double bpm; };
+        const G genres[] = { { 5, 138.0 }, { 6, 145.0 }, { 7, 124.0 }, { 8, 124.0 }, { 9, 124.0 } };
+        juce::AudioBuffer<float> loops (2, (int) (sr * 25)); loops.clear();
+        int writePos = 0;
+        for (auto& gnr : genres)
+        {
+            proc.setCurrentProgram (gnr.preset);
+            const int beat = (int) std::round (sr * 60.0 / gnr.bpm);
+            const int total = beat * 8 + (int) (sr * 0.6);
+            for (int pos = 0; pos < total; pos += block)
+            {
+                midi.clear();
+                for (int bt = 0; bt < 8; ++bt)
+                    if (bt * beat >= pos && bt * beat < pos + block) midi.addEvent (juce::MidiMessage::noteOn (1, 36, 1.0f), bt * beat - pos);
+                proc.processBlock (buf, midi);
+                if (writePos + pos + block <= loops.getNumSamples())
+                    for (int ch = 0; ch < 2; ++ch) loops.copyFrom (ch, writePos + pos, buf, ch, 0, block);
+            }
+            const auto& d = proc.getRendered()->data;
+            int zc = 0; const size_t a = d.size() * 6 / 10, b = d.size() * 9 / 10;
+            for (size_t i = a + 1; i < b; ++i) if (d[i - 1] < 0 && d[i] >= 0) ++zc;
+            std::printf ("loop %-24s %5.0f BPM  kick %4.0f ms  tail ~%4.1f Hz  (1/8 note = %3.0f ms)\n",
+                         proc.getProgramName (gnr.preset).toRawUTF8(), gnr.bpm, d.size() * 1000.0 / sr,
+                         zc / ((b - a) / sr), 30000.0 / gnr.bpm);
+            writePos += total;
+        }
+        juce::WavAudioFormat wav;
+        auto f = juce::File::getCurrentWorkingDirectory().getChildFile ("genre_loops.wav"); f.deleteFile();
+        if (auto w = std::unique_ptr<juce::AudioFormatWriter> (wav.createWriterFor (new juce::FileOutputStream (f), sr, 2, 16, {}, 0)))
+            w->writeFromAudioSampleBuffer (loops, 0, writePos);
+    }
+
     // state round trip including curves
     proc.setCurrentProgram (1);
     juce::MemoryBlock state; proc.getStateInformation (state);
@@ -58,7 +92,7 @@ int main()
                  proc.apvts.getRawParameterValue ("length")->load());
 
     // UI snapshots
-    proc.setCurrentProgram (2);
+    proc.setCurrentProgram (6);
     std::unique_ptr<juce::AudioProcessorEditor> ed (proc.createEditor());
     juce::PNGImageFormat png;
     auto snap = [&] (const char* name)
