@@ -176,8 +176,8 @@ inline std::vector<float> renderKick (const KickParams& p, const Curve& pitch, c
             if (p.clickType == 0)
             {
                 seed = seed * 1664525u + 1013904223u;
-                const float noise = ((seed >> 9) * (1.0f / 4194304.0f)) * 2.0f - 1.0f;
-                c = lp.process (hp.process (noise)) * 2.5f;
+                const float noise = ((seed >> 9) * (1.0f / 8388608.0f)) * 2.0f - 1.0f; // [-1, 1)
+                c = lp.process (hp.process (noise)) * 5.0f;
             }
             else
             {
